@@ -1,0 +1,3 @@
+include ':ufobeaconsdk-release'
+include ':app'
+rootProject.name = "WithU-TheSarthi"
