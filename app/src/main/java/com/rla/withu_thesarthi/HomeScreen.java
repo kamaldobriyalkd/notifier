@@ -264,7 +264,7 @@ public class HomeScreen extends AppCompatActivity {
         list.add("Staff Room");
         list.add("Sports Room");
         list.add("Main Gate");
-        list.add("Enterance");
+        list.add("Entrance");
         list.add("Stage");
         list.add("Men's Washroom");
         list.add("Women's Washroom");
