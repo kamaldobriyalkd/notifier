@@ -207,6 +207,7 @@ package com.rla.withu_thesarthi;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
@@ -216,7 +217,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -239,24 +239,25 @@ public class HomeScreen extends AppCompatActivity {
     ListView myList;
     UFOBeaconManager ufoBeaconManager;
     TextToSpeech toSpeech;
-    ProgressBar progressBar;
     TextView curLoc;
     Button startNav;
-
+    ProgressBar progressBar;
     ArrayList<String> list;
     ArrayAdapter<String> adapter;
+    BluetoothAdapter bluetoothAdapter;
 
     private ArrayList<UFODevice> ufoDevicesList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         ufoBeaconManager = new UFOBeaconManager(this);
         setContentView(R.layout.activity_home_screen);
         mySearchView = (SearchView) findViewById(R.id.searchView);
-        progressBar = (ProgressBar) findViewById(R.id.proBar);
         startNav = (Button) findViewById(R.id.startNavButton);
         curLoc = (TextView) findViewById(R.id.textView3);
+        progressBar = (ProgressBar) findViewById(R.id.progress);
         myList = (ListView) findViewById(R.id.myList);
         list = new ArrayList<String>();
         list.add("Admin Block");
@@ -309,7 +310,7 @@ public class HomeScreen extends AppCompatActivity {
                 mySearchView.setQuery(myList.getItemAtPosition(i).toString().trim(), false);
                 myList.setVisibility(View.GONE);
                 startNav.setVisibility(View.VISIBLE);
-                toSpeech.speak("Directions set for " + myList.getItemAtPosition(i).toString().trim() + " Please press start button to start navigation", TextToSpeech.QUEUE_FLUSH, null);
+                toSpeech.speak("Directions set for " + myList.getItemAtPosition(i).toString().trim() + " Please press Directions button to start navigation", TextToSpeech.QUEUE_FLUSH, null);
 
             }
         });
@@ -338,8 +339,8 @@ public class HomeScreen extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), path.class);
                 String target = mySearchView.getQuery().toString();
-                intent.putExtra("abc", target);
-                intent.putExtra("from", curLoc.getText());
+                intent.putExtra("final", target);
+                intent.putExtra("initial", curLoc.getText());
                 startActivity(intent);
                 toSpeech.speak("Directions started for " + mySearchView.getQuery().toString(), TextToSpeech.QUEUE_FLUSH, null);
             }
@@ -351,20 +352,6 @@ public class HomeScreen extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         startScanning();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        ufoDevicesList = new ArrayList<>();
-        stopScanning();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        ufoDevicesList = new ArrayList<>();
-        stopScanning();
     }
 
     public void btnSpeech(View view) {
@@ -409,7 +396,7 @@ public class HomeScreen extends AppCompatActivity {
                                 ufoDevicesList.add(ufodevice);
                                 String location = CurrentLocation.curLoc(ufodevice);
                                 curLoc.setText(location);
-                                progressBar.setVisibility(View.GONE);
+                                progressBar.setVisibility(View.INVISIBLE);
                             }
                         }
                     }
@@ -419,8 +406,6 @@ public class HomeScreen extends AppCompatActivity {
         }, new OnFailureListener() {
             @Override
             public void onFailure(final int code, final String message) {
-
-                // Log.e("startScan", "Error code:- " + code + " Message:- " + message);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -453,5 +438,30 @@ public class HomeScreen extends AppCompatActivity {
                 });
             }
         });
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        ufoDevicesList = new ArrayList<>();
+        stopScanning();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ufoDevicesList = new ArrayList<>();
+        stopScanning();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        curLoc.setText("Locating!!!");
+        progressBar.setVisibility(View.VISIBLE);
+        startNav.setVisibility(View.INVISIBLE);
+        if(!bluetoothAdapter.isEnabled()){
+            bluetoothAdapter.enable();
+        }
+
     }
 }
