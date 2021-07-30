@@ -6,7 +6,7 @@ public class CurrentLocation {
     public static String strLocation;
     public static String curLoc(UFODevice ufodevice){
         if(ufodevice.getMajor()==1 && ufodevice.getMinor()==1){
-            strLocation="Entrance Gate";
+            strLocation="Entrance";
         }else if(ufodevice.getMajor()==1 && ufodevice.getMinor()==2){
             strLocation="Stage";
         }

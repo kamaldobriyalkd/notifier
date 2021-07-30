@@ -277,7 +277,7 @@ public class HomeScreen extends AppCompatActivity {
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
         myList.setAdapter(adapter);
-
+        ufoBeaconManager=new UFOBeaconManager(getApplicationContext());
         // texttospeech
 
         toSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -444,6 +444,7 @@ public class HomeScreen extends AppCompatActivity {
         super.onStop();
         ufoDevicesList = new ArrayList<>();
         stopScanning();
+        startScanning();
     }
 
     @Override
@@ -451,6 +452,7 @@ public class HomeScreen extends AppCompatActivity {
         super.onPause();
         ufoDevicesList = new ArrayList<>();
         stopScanning();
+        startScanning();
     }
 
     @Override
@@ -462,6 +464,7 @@ public class HomeScreen extends AppCompatActivity {
         if(!bluetoothAdapter.isEnabled()){
             bluetoothAdapter.enable();
         }
-
+        stopScanning();
+        startScanning();
     }
 }
